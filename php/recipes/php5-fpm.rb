@@ -36,6 +36,16 @@ case node[:platform]
     end
 end
 
+service "php5-fpm" do
+  action    [ :enable, :start ]
+  supports  :restart => true, :reload => true, :status => false
+end
+
 node[:php][:modules].each do |mod|
   include_recipe "php::module_#{mod}" if MODULES.include?(mod)
+
+  execute "reload_php5_fpm" do
+    command   %{echo "woop woop"}
+    notifies  :reload, "service[php5-fpm]"
+  end
 end
