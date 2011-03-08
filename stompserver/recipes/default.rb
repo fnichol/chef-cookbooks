@@ -38,12 +38,14 @@ end
 
 include_recipe "runit"
 
+rvm_ruby = node[:stompserver][:rvm_ruby] || "#{node[:rvm][:default_ruby]}@stompserver"
+
 rvm_gem "stompserver" do
-  ruby_string "default@stompserver"
+  ruby_string rvm_ruby
 end
 
 rvm_wrapper "sys" do
-  ruby_string "default@stompserver"
+  ruby_string rvm_ruby
   binary      "stompserver"
 end
 
