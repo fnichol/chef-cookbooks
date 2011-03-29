@@ -49,3 +49,6 @@
 [submodule "homebrew"]
 	path = homebrew
 	url = git://github.com/mathie/chef-homebrew.git
+[submodule "platform_ubuntu"]
+	path = platform_ubuntu
+	url = git://github.com/fnichol/chef-platform_ubuntu.git
