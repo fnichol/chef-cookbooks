@@ -19,9 +19,9 @@
 
 package "apache2" do
   case node[:platform]
-  when "centos","redhat","fedora","suse"
+  when "centos","redhat","fedora"
     package_name "httpd"
-  when "debian","ubuntu"
+  when "debian","ubuntu","suse"
     package_name "apache2"
   when "arch"
     package_name "apache"
@@ -31,7 +31,7 @@ end
 
 service "apache2" do
   case node[:platform]
-  when "centos","redhat","fedora","suse"
+  when "centos","redhat","fedora"
     service_name "httpd"
     # If restarted/reloaded too quickly httpd has a habit of failing.
     # This may happen with multiple recipes notifying apache to restart - like
@@ -44,6 +44,8 @@ service "apache2" do
     reload_command "/usr/sbin/invoke-rc.d apache2 reload && sleep 1"
   when "arch"
     service_name "httpd"
+  when "suse"
+    service_name "apache2"
   end
   supports value_for_platform(
     "debian" => { "4.0" => [ :restart, :reload ], "default" => [ :restart, :reload, :status ] },
@@ -52,6 +54,7 @@ service "apache2" do
     "redhat" => { "default" => [ :restart, :reload, :status ] },
     "fedora" => { "default" => [ :restart, :reload, :status ] },
     "arch" => { "default" => [ :restart, :reload, :status ] },
+    "suse" => { "default" => [ :restart, :reload, :status ] },
     "default" => { "default" => [:restart, :reload ] }
   )
   action :enable
@@ -85,7 +88,12 @@ if platform?("centos", "redhat", "fedora", "suse", "arch")
     else 
       libdir = "lib"
     end
-    command "/usr/local/bin/apache2_module_conf_generate.pl /usr/#{libdir}/httpd/modules /etc/httpd/mods-available"
+    if platform?("suse")
+      modules_dir = "/usr/#{libdir}/apache2"
+    else
+      modules_dir = "/usr/#{libdir}/httpd/modules"
+    end
+    command "/usr/local/bin/apache2_module_conf_generate.pl #{modules_dir} #{node[:apache][:dir]}/mods-available"
     action :run
   end
   
