@@ -17,12 +17,10 @@
 # limitations under the License.
 #
 
-include_recipe "iptables"
-
 packages = case node[:platform]
   when "centos","redhat","fedora"
     %w{openssh-clients openssh}
-  when "arch"
+  when "arch","suse"
     %w{openssh}
   else
     %w{openssh-client openssh-server}
@@ -34,7 +32,7 @@ end
 
 service "ssh" do
   case node[:platform]
-  when "centos","redhat","fedora","arch"
+  when "centos","redhat","fedora","arch","suse"
     service_name "sshd"
   else
     service_name "ssh"
@@ -49,27 +47,28 @@ service "ssh" do
     "redhat" => { "default" => [ :restart, :reload, :status ] },
     "fedora" => { "default" => [ :restart, :reload, :status ] },
     "arch" => { "default" => [ :restart ] },
+    "suse" => { "default" => [ :restart, :reload, :status ] },
     "default" => { "default" => [:restart, :reload ] }
   )
   action [ :enable, :start ]
 end
 
 case node[:platform]
-when "ubuntu"
+when "ubuntu","suse"
 
-  if node.platform_version.to_f >= 10.10
-    template "/etc/ssh/sshd_config" do
-      source "sshd_config.erb"
-      owner "root"
-      group "root"
-      mode "0644"
-      notifies :restart, "service[ssh]", :immediately
-    end
+  template "/etc/ssh/sshd_config" do
+    source "sshd_config.erb"
+    owner "root"
+    group "root"
+    mode "0644"
+    notifies :restart, "service[ssh]", :immediately
   end
 end
 
 case node[:platform]
 when "redhat","centos","debian","ubuntu"
+  include_recipe "iptables"
+
   iptables_rule "port_ssh" do
     if node[:openssh][:iptables_allow] == "disable"
       enable false
