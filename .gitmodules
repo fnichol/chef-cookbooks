@@ -52,3 +52,6 @@
 [submodule "platform_ubuntu"]
 	path = platform_ubuntu
 	url = git://github.com/fnichol/chef-platform_ubuntu.git
+[submodule "platform_suse"]
+	path = platform_suse
+	url = git://github.com/fnichol/chef-platform_suse.git
