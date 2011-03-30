@@ -28,6 +28,10 @@ when "centos"
   package "gcc" do
     action :install
   end
+when "suse"
+  package "gcc-c++" do
+    action :install
+  end
 end
 
 package "autoconf" do
