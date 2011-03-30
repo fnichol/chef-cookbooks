@@ -73,15 +73,30 @@ if platform?("centos", "redhat", "fedora", "suse", "arch")
     group "root"
   end
 
-  %w{sites-available sites-enabled mods-available mods-enabled}.each do |dir|
-    directory "#{node[:apache][:dir]}/#{dir}" do
-      mode 0755
-      owner "root"
-      group "root"
-      action :create
+  if platform?("suse")
+    %w{sites-available mods-available mods-enabled}.each do |dir|
+      directory "#{node[:apache][:dir]}/#{dir}" do
+        mode 0755
+        owner "root"
+        group "root"
+        action :create
+      end
+    end
+
+    link "#{node[:apache][:dir]}/sites-enabled" do
+      to "#{node[:apache][:dir]}/vhosts.d"
+    end
+  else
+    %w{sites-available sites-enabled mods-available mods-enabled}.each do |dir|
+      directory "#{node[:apache][:dir]}/#{dir}" do
+        mode 0755
+        owner "root"
+        group "root"
+        action :create
+      end
     end
   end
-    
+
   execute "generate-module-list" do
     if node[:kernel][:machine] == "x86_64" 
       libdir = value_for_platform("arch" => { "default" => "lib" }, "default" => "lib64")
@@ -149,6 +164,8 @@ template "apache2.conf" do
     path "#{node[:apache][:dir]}/conf/httpd.conf"
   when "debian","ubuntu"
     path "#{node[:apache][:dir]}/apache2.conf"
+  when "suse"
+    path "#{node[:apache][:dir]}/httpd.conf"
   end
   source "apache2.conf.erb"
   owner "root"
