@@ -55,3 +55,6 @@
 [submodule "platform_suse"]
 	path = platform_suse
 	url = git://github.com/fnichol/chef-platform_suse.git
+[submodule "oracle_instantclient"]
+	path = oracle_instantclient
+	url = git://github.com/fnichol/chef-oracle_instantclient.git
