@@ -85,5 +85,22 @@ define :user_account, :uid => nil, :gid => nil,
       variables :ssh_keys => params[:ssh_keys]
     end
   end
+
+  execute "create ssh key for #{params[:name]}" do
+    cwd       home_dir
+    user      params[:name]
+    if params[:create_group]
+      group params[:name]
+    else
+      group params[:gid] || params[:name]
+    end
+    command   <<-KEYGEN
+      ssh-keygen -t dsa -f #{home_dir}/.ssh/id_dsa -N '' \
+        -C '#{params[:name]}@#{node[:fqdn]}'
+      chmod 0600 #{home_dir}/.ssh/id_dsa
+      chmod 0644 #{home_dir}/.ssh/id_dsa.pub
+    KEYGEN
+    creates   "#{home_dir}/.ssh/id_dsa"
+  end
 end
 
