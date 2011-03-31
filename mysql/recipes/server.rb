@@ -50,11 +50,15 @@ when "debian","ubuntu"
 end
 
 package "mysql-server" do
+  package_name value_for_platform(
+    "suse" => { "default" => "mysql" },
+    "default" => "mysql-server"
+  )
   action :install
 end
 
 service "mysql" do
-  service_name value_for_platform([ "centos", "redhat", "suse", "fedora" ] => {"default" => "mysqld"}, "default" => "mysql")
+  service_name value_for_platform([ "centos", "redhat", "fedora" ] => {"default" => "mysqld"}, "default" => "mysql")
   if (platform?("ubuntu") && node.platform_version.to_f >= 10.04)
     # thanks to: http://tickets.opscode.com/browse/CHEF-1424
     provider Chef::Provider::Service::Upstart
