@@ -17,7 +17,6 @@
 # limitations under the License.
 #
 
-include_recipe "iptables"
 include_recipe "mysql::client"
 
 case node[:platform]
@@ -139,6 +138,8 @@ end
 
 case node[:platform]
 when "redhat","centos","debian","ubuntu"
+  include_recipe "iptables"
+
   iptables_rule "port_mysql" do
     if node[:mysql][:iptables_allow] == "disable"
       enable false
