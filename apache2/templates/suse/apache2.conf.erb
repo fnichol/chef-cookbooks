@@ -120,10 +120,13 @@ ErrorLog /var/log/apache2/error_log
 # Include module configuration:
 Include <%= node[:apache][:dir] %>/mods-enabled/*.load
 Include <%= node[:apache][:dir] %>/mods-enabled/*.conf
-# END: Chef
+
+# disable listen.conf as chef is managing listen ports and virtual hosts
+#Include /etc/apache2/listen.conf
 
 # IP addresses / ports to listen on
-Include /etc/apache2/listen.conf
+Include /etc/apache2/ports.conf
+# END: Chef
 
 # predefined logging formats
 Include /etc/apache2/mod_log_config.conf
