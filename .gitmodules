@@ -58,3 +58,6 @@
 [submodule "oracle_instantclient"]
 	path = oracle_instantclient
 	url = git://github.com/fnichol/chef-oracle_instantclient.git
+[submodule "platform_packages"]
+	path = platform_packages
+	url = git://github.com/fnichol/chef-platform_packages.git
