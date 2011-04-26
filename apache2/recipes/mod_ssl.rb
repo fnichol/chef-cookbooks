@@ -45,7 +45,16 @@ end
 
 if platform?("suse")
   file "#{node[:apache][:dir]}/mods-available/ssl.flags" do
-    content "SSL"
+    content "SSL\n"
+    notifies :restart, resources(:service => "apache2")
+  end
+
+  link "/etc/ssl/certs/ssl-cert-snakeoil.pem" do
+    to  "#{node[:apache][:dir]}/ssl.crt/snakeoil-rsa.crt"
+  end
+
+  link "/etc/ssl/private/ssl-cert-snakeoil.key" do
+    to  "#{node[:apache][:dir]}/ssl.key/snakeoil-rsa.key"
   end
 end
 

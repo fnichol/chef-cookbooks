@@ -19,7 +19,8 @@
 
 if platform?("suse")
   file "#{node[:apache][:dir]}/mods-available/status.flags" do
-    content "STATUS"
+    content "STATUS\n"
+    notifies :restart, resources(:service => "apache2")
   end
 end
 
