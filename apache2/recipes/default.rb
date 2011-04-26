@@ -104,7 +104,7 @@ if platform?("centos", "redhat", "fedora", "suse", "arch")
       libdir = "lib"
     end
     if platform?("suse")
-      modules_dir = "/usr/#{libdir}/apache2"
+      modules_dir = "/usr/#{libdir}/apache2-prefork"
     else
       modules_dir = "/usr/#{libdir}/httpd/modules"
     end
@@ -138,63 +138,78 @@ if platform?("centos", "redhat", "fedora", "suse", "arch")
   end
 end
 
-directory "#{node[:apache][:dir]}/ssl" do
-  action :create
-  mode 0755
-  owner "root"
-  group "root"
-end
-
-directory "#{node[:apache][:dir]}/conf.d" do
-  action :create
-  mode 0755
-  owner "root"
-  group "root"
-end
-
-directory node[:apache][:cache_dir] do
-  action :create
-  mode 0755
-  owner node[:apache][:user]
-end
-
-template "apache2.conf" do
-  case node[:platform]
-  when "centos","redhat","fedora","arch"
-    path "#{node[:apache][:dir]}/conf/httpd.conf"
-  when "debian","ubuntu"
-    path "#{node[:apache][:dir]}/apache2.conf"
-  when "suse"
-    path "#{node[:apache][:dir]}/httpd.conf"
+if platform?("suse")
+  template "/etc/sysconfig/apache2" do
+    source    "sysconfig_apache2.erb"
+    owner     "root"
+    group     "root"
+    mode      "0644"
+    notifies  :restart, "service[apache2]"
   end
-  source "apache2.conf.erb"
-  owner "root"
-  group "root"
-  mode 0644
-  notifies :restart, resources(:service => "apache2")
+else
+  directory "#{node[:apache][:dir]}/ssl" do
+    action :create
+    mode 0755
+    owner "root"
+    group "root"
+  end
+
+  directory "#{node[:apache][:dir]}/conf.d" do
+    action :create
+    mode 0755
+    owner "root"
+    group "root"
+  end
+
+  directory node[:apache][:cache_dir] do
+    action :create
+    mode 0755
+    owner node[:apache][:user]
+  end
+
+  template "apache2.conf" do
+    case node[:platform]
+    when "centos","redhat","fedora","arch"
+      path "#{node[:apache][:dir]}/conf/httpd.conf"
+    when "debian","ubuntu"
+      path "#{node[:apache][:dir]}/apache2.conf"
+    when "suse"
+      path "#{node[:apache][:dir]}/httpd.conf"
+    end
+    source "apache2.conf.erb"
+    owner "root"
+    group "root"
+    mode 0644
+    notifies :restart, resources(:service => "apache2")
+  end
+
+  template "security" do
+    path "#{node[:apache][:dir]}/conf.d/security"
+    source "security.erb"
+    owner "root"
+    group "root"
+    mode 0644
+    backup false
+    notifies :restart, resources(:service => "apache2")
+  end
+
+  template "charset" do
+    path "#{node[:apache][:dir]}/conf.d/charset"
+    source "charset.erb"
+    owner "root"
+    group "root"
+    mode 0644
+    backup false
+    notifies :restart, resources(:service => "apache2")
+  end
 end
 
-template "security" do
-  path "#{node[:apache][:dir]}/conf.d/security"
-  source "security.erb"
-  owner "root"
-  group "root"
-  mode 0644
-  backup false
-  notifies :restart, resources(:service => "apache2")
+ports_conf = if platform?("suse")
+  "listen.conf"
+else
+  "ports.conf"
 end
-
-template "charset" do
-  path "#{node[:apache][:dir]}/conf.d/charset"
-  source "charset.erb"
-  owner "root"
-  group "root"
-  mode 0644
-  backup false
-  notifies :restart, resources(:service => "apache2")
-end
-
-template "#{node[:apache][:dir]}/ports.conf" do
+template "#{node[:apache][:dir]}/#{ports_conf}" do
   source "ports.conf.erb"
   group "root"
   owner "root"
@@ -203,12 +218,14 @@ template "#{node[:apache][:dir]}/ports.conf" do
   notifies :restart, resources(:service => "apache2")
 end
 
-template "#{node[:apache][:dir]}/sites-available/default" do
-  source "default-site.erb"
-  owner "root"
-  group "root"
-  mode 0644
-  notifies :restart, resources(:service => "apache2")
+unless platform?("suse")
+  template "#{node[:apache][:dir]}/sites-available/default" do
+    source "default-site.erb"
+    owner "root"
+    group "root"
+    mode 0644
+    notifies :restart, resources(:service => "apache2")
+  end
 end
 
 include_recipe "apache2::mod_status"
