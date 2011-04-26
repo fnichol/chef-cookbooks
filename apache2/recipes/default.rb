@@ -21,10 +21,12 @@ package "apache2" do
   case node[:platform]
   when "centos","redhat","fedora"
     package_name "httpd"
-  when "debian","ubuntu","suse"
+  when "debian","ubuntu"
     package_name "apache2"
   when "arch"
     package_name "apache"
+  when "suse"
+    package_name "apache2-prefork"
   end
   action :install
 end
