@@ -91,7 +91,7 @@ APACHE_CONF_INCLUDE_DIRS="<%= node[:apache][:dir] %>/mods-enabled/*.conf"
 # Chef note: rather than muck with a one-line shell variable, this list will
 # be populated by reading in all enabled mods found under mods-enabled/*.load
 #
-APACHE_MODULES="`cat \`ls -1 <%= node[:apache][:dir] %>/mods-enabled/*.load | sort\` | awk '{print $3}'`"
+APACHE_MODULES="`if ls -1 <%= node[:apache][:dir] %>/mods-enabled | grep -q '\.load$' >/dev/null ; then cat \`ls -1 <%= node[:apache][:dir] %>/mods-enabled/*.load | sort\` | awk '{print $3}' ; else echo '' ; fi`"
 
 
 ## Type:	string
@@ -123,7 +123,7 @@ APACHE_MODULES="`cat \`ls -1 <%= node[:apache][:dir] %>/mods-enabled/*.load | so
 #
 # Chef note: flags will be read onout mods-enabled/*.flags if any exist
 #
-APACHE_SERVER_FLAGS="`if ls -1 <%= node[:apache][:dir] %>/mods-enabled | grep -q '\.flags$' >/dev/null ; then cat \`ls -1 <%= node[:apache][:dir] %>/mods-enabled/*.flags | sort\` ; else echo '' ; fi`"
+APACHE_SERVER_FLAGS="`if ls -1 <%= node[:apache][:dir] %>/mods-enabled | grep -q '\.flags$' >/dev/null ; then cat \`ls -1 <%= node[:apache][:dir] %>/mods-enabled/*.flags | sort\` | xargs ; else echo '' ; fi`"
 
 ## Type:	string
 ## Default:	""
