@@ -18,5 +18,5 @@
 #
 
 apache_module "negotiation" do
-  conf true
+  conf platform?("suse") ? false : true
 end

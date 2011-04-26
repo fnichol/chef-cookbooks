@@ -17,6 +17,12 @@
 # limitations under the License.
 #
 
+if platform?("suse")
+  file "#{node[:apache][:dir]}/mods-available/status.flags" do
+    content "STATUS"
+  end
+end
+
 apache_module "status" do
-  conf true
+  conf platform?("suse") ? false : true
 end

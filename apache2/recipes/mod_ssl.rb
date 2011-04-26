@@ -31,12 +31,24 @@ end
 
 ports = node[:apache][:listen_ports].include?("443") ? node[:apache][:listen_ports] : [node[:apache][:listen_ports], "443"].flatten
 
-template "#{node[:apache][:dir]}/ports.conf" do
+ports_conf = if platform?("suse")
+  "listen.conf"
+else
+  "ports.conf"
+end
+
+template "#{node[:apache][:dir]}/#{ports_conf}" do
   source "ports.conf.erb"
   variables :apache_listen_ports => ports
   notifies :restart, resources(:service => "apache2")
 end
 
+if platform?("suse")
+  file "#{node[:apache][:dir]}/mods-available/ssl.flags" do
+    content "SSL"
+  end
+end
+
 apache_module "ssl" do
-  conf true
+  conf platform?("suse") ? false : true
 end

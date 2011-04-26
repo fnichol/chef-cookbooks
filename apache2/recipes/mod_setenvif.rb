@@ -18,5 +18,5 @@
 #
 
 apache_module "setenvif" do
-  conf true
+  conf platform?("suse") ? false : true
 end
