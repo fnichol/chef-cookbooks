@@ -28,7 +28,11 @@ if ! [ -e $SYSCONFDIR/mods-available/$MODNAME.load ]; then
         exit 1
 fi
 
-for i in conf load; do 
+<% if node[:platform] == "suse" -%>
+for i in conf load flags; do
+<% else -%>
+for i in conf load; do
+<% end -%>
         if [ -e $SYSCONFDIR/mods-available/$MODNAME.$i -a ! -e $SYSCONFDIR/mods-enabled/$MODNAME.$i ]; then
         ln -sf $SYSCONFDIR/mods-available/$MODNAME.$i $SYSCONFDIR/mods-enabled/$MODNAME.$i;
         fi
