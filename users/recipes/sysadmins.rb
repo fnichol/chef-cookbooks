@@ -2,8 +2,7 @@
 # Cookbook Name:: users
 # Recipe:: sysadmins
 #
-# Copyright 2009, Opscode, Inc.
-# Copyright 2010, Fletcher Nichol
+# Copyright 2009-2011, Opscode, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
 sysadmin_group = Array.new
 
 if Chef::Config.solo
@@ -35,6 +35,14 @@ users.each do |u|
   end
 
   home_dir = "/home/#{u['id']}"
+
+  # fixes CHEF-1699
+  ruby_block "reset group list" do
+    block do
+      Etc.endgrent
+    end
+    action :nothing
+  end
 
   if !u['create_group'].nil? && u['create_group'] == true
     create_group = true
@@ -59,6 +67,7 @@ users.each do |u|
     comment u['comment']
     supports :manage_home => true
     home home_dir
+    notifies :create, "ruby_block[reset group list]", :immediately
   end
 
   directory "#{home_dir}" do

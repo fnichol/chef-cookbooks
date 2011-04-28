@@ -22,5 +22,6 @@ define :apache_conf do
     source "mods/#{params[:name]}.conf.erb"
     mode "0644"
     notifies :restart, resources(:service => "apache2")
+    mode 0644
   end
 end

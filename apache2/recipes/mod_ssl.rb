@@ -41,6 +41,7 @@ template "#{node[:apache][:dir]}/#{ports_conf}" do
   source "ports.conf.erb"
   variables :apache_listen_ports => ports
   notifies :restart, resources(:service => "apache2")
+  mode 0644
 end
 
 if platform?("suse")
