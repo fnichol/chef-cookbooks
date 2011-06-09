@@ -27,6 +27,8 @@ attribute "openssh/port",
 
 attribute "openssh/listen_address",
   :display_name => "Specifies the local addresses sshd should listen on",
+  :type => "array",
+  :default => [ "0.0.0.0" ],
   :description => <<-DESC
     Specifies the local addresses sshd should listen on.
     The following forms may be used:
@@ -40,9 +42,6 @@ attribute "openssh/listen_address",
     Multiple ListenAddress options are permitted. Additionally, any Port 
     options must precede this option for non-port qualified addresses.
   DESC
-  ,
-  :type => "array",
-  :default => [ "0.0.0.0" ]
 
 attribute "openssh/permit_root_login",
   :display_name => "Specifies whether root can log in using ssh",
