@@ -60,6 +60,27 @@ The following attributes are generated in
 * `node['postgresql']['ssl']` - whether to enable SSL (off for version
   8.3, true for 8.4).
 
+
+Basic configuration 
+
+* `node[:postgresql][:listen_address]` - default to localhost
+* `node[:postgresql][:port]` - 5432
+
+Commonly used performance tuning attributes
+
+* `node[:postgresql][:tunable][:max_connections]` - Determines the maximum number of concurrent connections to the database server
+* `node[:postgresql][:tunable][:shared_buffers]` - Sets the amount of memory the database server uses for shared memory buffers.
+* `node[:postgresql][:tunable][:effective_cache_size]` - Sets the planner's assumption about the effective size of the disk cache that is available to a single query.
+* `node[:postgresql][:tunable][:work_mem]` - Specifies the amount of memory to be used by internal sort operations and hash tables before writing to temporary disk files. 
+* `node[:postgresql][:tunable][:synchronous_commit]` - Specifies whether transaction commit will wait for WAL records to be written to disk before the command returns a "success" indication to the client.
+* `node[:postgresql][:tunable][:wal_buffer]` - The amount of shared memory used for WAL data that has not yet been written to disk.
+* `node[:postgresql][:tunable][:wal_sync_method]` - Method used for forcing WAL updates out to disk.
+* `node[:postgresql][:tunable][:checkpoint_segments]` Maximum number of log file segments between automatic WAL checkpoints (each segment is normally 16 megabytes).
+* `node[:postgresql][:tunable][:checkpoint_timeout]` - Maximum time between automatic WAL checkpoints, in seconds.
+* `node[:postgresql][:tunable][:checkpoint_completion_target]` - Specifies the target of checkpoint completion, as a fraction of total time between checkpoints.
+
+Default values match those provided by Postgresql. For tuning, please, referer to [PgSQL Wiki](http://wiki.postgresql.org/wiki/Performance_Optimization) or [Postgresql 9.0 High Performance Guide](http://www.2ndquadrant.com/en/postgresql-90-high-performance/).
+
 Recipes
 =======
 
